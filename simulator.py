@@ -1,10 +1,20 @@
+"""
+Instructions: 
+    You will need to use command lines in the terminal to use the program.
+    To start enter the following line:
+        m = read_map('nyc_map.csv')
+    Now you can view the map with the following command:
+        m.display()
+    To start the infection:
+        m.cells[(39,82)].infect()
+        m.time_step()
+    To see how it progresses re-enter:
+        m.time_step()
+"""
+
 import random
 import math
 from matplotlib import pyplot as plt
-
-#When you go to extra-help 
-#Ask about process: infection, recovery, mortality
-# what is normpdf supposed to do. Nevermind figured that out
 
 
 def normpdf(x, mean, sd):
@@ -12,7 +22,7 @@ def normpdf(x, mean, sd):
     Return the value of the normal distribution 
     with the specified mean and standard deviation (sd) at
     position x.
-    You do not have to understand how this function works exactly. 
+    @This function was provided by Professor Bauer.
     """
     var = float(sd)**2
     denom = (2*math.pi*var)**.5
@@ -29,9 +39,11 @@ def pdeath(x, mean, sd):
         start += step            
     return integral    
     
-recovery_time = 4 # recovery time in time-steps
-virality = .5    # probability that a neighbor cell is infected in 
-                  # each time step                                                  
+recovery_time = 4  
+# number of time-steps to recover.
+virality = .5   
+# probability that a neighbor cell is infected in each time step.
+                                                                
 
 class Cell(object):
 
@@ -39,8 +51,8 @@ class Cell(object):
         self.x = x
         self.y = y 
         self.time_infected=0
-        self.state = "S" # can be "S" (susceptible), "R" (resistant = dead), or 
-                         # "I" (infected)
+        self.state = "S" 
+        # can be "S" (susceptible), "R" (resistant = dead), or # "I" (infected)
         
     def infect(self):
         self.state="I"
@@ -77,16 +89,13 @@ class Cell(object):
                         if infection<=virality:
                             cell.infect()
         
-                
-    
-            
         else:
             return
     
         
         
 class Map(object):
-    
+    #Function to build map of New York for CSV data
     def __init__(self):
         self.height = 150
         self.width = 150           
@@ -95,7 +104,7 @@ class Map(object):
     def add_cell(self, cell):
            self.cells[cell.x,cell.y]=cell 
         
-    #Need to check color_cell and display
+    #Colors each cell based on its current status
     def color_cell(self,cell):
         if cell.state== "S":
             return (0.0,1.0,0.0)
@@ -106,8 +115,6 @@ class Map(object):
     
     def display(self):
         image= []
-        
-        #Needs to be a list of lists for the cell to make each cell a pixel
         for i in range(150):
             row=[]
             for j in range(150):
@@ -119,7 +126,7 @@ class Map(object):
             image.append(row)
           
         plt.imshow(image)
-
+    #Function finds the adjacent cells for each cell
     def adjacent_cells(self, x,y):
         valid_neighbors=[]
         neighbors=[(x+1,y),(x-1,y),(x,y-1),(x,y+1)]
@@ -127,14 +134,14 @@ class Map(object):
             if neighbor in self.cells:
                 valid_neighbors.append(self.cells[neighbor])
         return valid_neighbors
-    
+    #Used to simulate the next moment in the simulation.
     def time_step(self):
         for (x,y) in self.cells:
             self.cells[x,y].process(self.adjacent_cells(x,y))
         self.display()
             
                 
-            
+#Gathers data from the CSV to build the map.           
 def read_map(filename):
    filename=open(filename,'r')
    m = Map()
